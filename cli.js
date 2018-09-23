@@ -2,25 +2,43 @@
 'use strict';
 
 const rollup = require('rollup');
-const babel = require('rollup-plugin-babel');
+const buble = require('rollup-plugin-buble');
 const strip = require('rollup-plugin-strip');
 const uglify = require('rollup-plugin-uglify');
 
 
 const cli = require('yargs')
-		.usage('jsrollup [-m] input.js')
-		.describe('p', 'Production remove debugging and minify')
-		.describe('s', 'Remove debuging')
-		.describe('m', 'Minify the output file')
-		.describe('o', 'Output file')
-		.describe('skip-map', 'No source map')
-		.describe('verbose', 'Verbose output')
-		.alias('m', 'minify')
-		.alias('s', 'strip')
-		.alias('p', 'prod')
-		.alias('o', 'output')
-		.alias('v', 'verbose')
-		.boolean(['prod', 'strip', 'minify', 'skip-map', 'verbose'])
+		.usage('webrollup [options] input.js')
+		.option('o', {
+			alias: 'output',
+			describe: 'Output file name',
+			type: 'string',
+		})
+		.option('p', {
+			alias: ['prod'],
+			describe: 'Enable production mode, remove debugging and minify',
+			boolean: true,
+		})
+		.option('v', {
+			alias: 'verbose',
+			describe: 'Print more verbose output',
+			boolean: true,
+		})
+		.option('m', {
+			alias: 'minify',
+			describe: 'Minify the output file',
+			boolean: true,
+		})
+		.option('s', {
+			alias: 'strip',
+			describe: 'Remove debugging constructs',
+			boolean: true,
+		})
+		.option('map', {
+			describe: 'Produce a sourcemap',
+			implies: 'o',
+			boolean: true,
+		})
 		.alias('h', 'help')
 		.argv;
 
@@ -29,13 +47,7 @@ const inOpts = {
 	input: cli._[0],
 
 	plugins: [
-		babel({
-			babelrc: false,
-			exclude: 'node_modules/**',
-			presets: [
-				"@babel/preset-env"
-			],
-		}),
+		buble(),
 	],
 };
 
@@ -47,7 +59,7 @@ function process_output_opts() {
 	if (cli.output) {
 		outOpts.file = cli.output;
 
-		if (!cli.skipMap) {
+		if (cli.map) {
 			outOpts.sourcemap = true;
 		}
 	}
@@ -55,7 +67,6 @@ function process_output_opts() {
 
 function process_input_opts() {
 	const plugins = inOpts.plugins;
-
 
 	if (cli.prod || cli.strip) {
 		plugins.push(
@@ -78,7 +89,7 @@ async function build() {
 	const bundle = await rollup.rollup(inOpts);
 
 	if (outOpts.file === undefined) {
-		const {code, map} = await bundle.generate(outOpts);
+		const {code} = await bundle.generate(outOpts);
 		process.stdout.write(code);
 	} else {
 		await bundle.write(outOpts);
