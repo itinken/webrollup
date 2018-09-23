@@ -5,10 +5,11 @@ const rollup = require('rollup');
 const buble = require('rollup-plugin-buble');
 const strip = require('rollup-plugin-strip');
 const uglify = require('rollup-plugin-uglify');
+const yargs = require('yargs');
+const finder = require('./findfile.js');
 
 
-const cli = require('yargs')
-		.usage('webrollup [options] input.js')
+const cli = yargs.usage('webrollup [options] input.js')
 		.option('o', {
 			alias: 'output',
 			describe: 'Output file name',
@@ -40,6 +41,7 @@ const cli = require('yargs')
 			boolean: true,
 		})
 		.alias('h', 'help')
+		.demandCommand(1)
 		.argv;
 
 
@@ -47,6 +49,7 @@ const inOpts = {
 	input: cli._[0],
 
 	plugins: [
+		finder.rollup_plugin_search_path(),
 		buble(),
 	],
 };
@@ -79,6 +82,7 @@ function process_input_opts() {
 	}
 
 	if (cli.verbose) {
+
 	}
 }
 
