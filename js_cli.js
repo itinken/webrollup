@@ -54,7 +54,7 @@ const inOpts = {
 		svelte({
 			css(css) {
 			  css.write('res/css/comps.css');
-      },
+			},
 		}),
 		buble({
 			transforms: {

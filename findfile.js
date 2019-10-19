@@ -32,6 +32,8 @@ function rollup_plugin_search_path() {
 		name: 'search_path',
 
 		resolveId: function (tee, ter) {
+			if (tee === 'svelte/internal')
+				return path.join(__dirname, 'node_modules', 'svelte', 'internal', 'index.mjs');
 			return js_search.find(tee);
 		}
 
