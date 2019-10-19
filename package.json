@@ -6,13 +6,29 @@
   "repository": "elsewhere",
   "private": true,
   "bin": {
-    "webrollup": "./cli.js"
+    "jsrollup": "./js_cli.js",
+    "cssrollup": "./css_cli.js"
   },
   "dependencies": {
-    "rollup": "^0.66.2",
-    "rollup-plugin-buble": "^0.19.2",
-    "rollup-plugin-strip": "^1.1.1",
-    "rollup-plugin-uglify": "^6.0.0",
-    "yargs": "^12.0.2"
+    "autoprefixer": "^9.6.0",
+    "css-mqpacker": "^7.0.0",
+    "cssnano": "^4.1.10",
+    "file-exists": "^5.0.1",
+    "perfectionist": "^2.4.0",
+    "postcss": "^7.0.17",
+    "postcss-calc": "^6.0.2",
+    "postcss-conditionals": "^2.1.0",
+    "postcss-css-variables": "^0.9.0",
+    "postcss-custom-media": "^7.0.8",
+    "postcss-extend-rule": "^2.0.0",
+    "postcss-import": "^12.0.1",
+    "rollup": "^0.66.6",
+    "rollup-plugin-buble": "^0.19.8",
+    "rollup-plugin-strip": "^1.2.1",
+    "rollup-plugin-svelte": "^4.5.0",
+    "rollup-plugin-terser": "^3.0.0",
+    "rollup-plugin-uglify": "^6.0.2",
+    "svelte": "^2.16.1",
+    "yargs": "^12.0.5"
   }
 }

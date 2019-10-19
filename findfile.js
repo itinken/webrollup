@@ -7,12 +7,11 @@ function searcher(envname, ext) {
 
 	return {
 		find: function(name) {
-
 			if (ext !== undefined && !name.endsWith(ext))
 				name = `${name}.${ext}`;
 
 			if (name.startsWith('./') || name.startsWith('../') || name.startsWith('/'))
-				return name;
+				return undefined;
 
 			for (i = 0; i < dirs.length; i++) {
 				const dir = dirs[i];
@@ -31,7 +30,7 @@ function rollup_plugin_search_path() {
 	const js_search = searcher('JS_PATH', 'js');
 	return {
 		name: 'search_path',
-		
+
 		resolveId: function (tee, ter) {
 			return js_search.find(tee);
 		}

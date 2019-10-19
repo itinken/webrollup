@@ -4,7 +4,8 @@
 const rollup = require('rollup');
 const buble = require('rollup-plugin-buble');
 const strip = require('rollup-plugin-strip');
-const uglify = require('rollup-plugin-uglify');
+const terser = require('rollup-plugin-terser');
+const svelte = require('rollup-plugin-svelte');
 const yargs = require('yargs');
 const finder = require('./findfile.js');
 
@@ -50,7 +51,16 @@ const inOpts = {
 
 	plugins: [
 		finder.rollup_plugin_search_path(),
-		buble(),
+		svelte({
+			css(css) {
+			  css.write('res/css/comps.css');
+      },
+		}),
+		buble({
+			transforms: {
+				dangerousForOf: true,
+			}
+		}),
 	],
 };
 
@@ -78,7 +88,7 @@ function process_input_opts() {
 	}
 
 	if (cli.prod || cli.minify) {
-		plugins.push(uglify.uglify());
+		plugins.push(terser.terser());
 	}
 
 	if (cli.verbose) {
