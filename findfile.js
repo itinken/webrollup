@@ -26,17 +26,23 @@ function searcher(envname, ext) {
 	}
 }
 
+// Resolve a path within the webrollup directory.
+function node_resolve(parts) {
+	return path.join(__dirname, 'node_modules', ...parts, 'index.mjs')
+}
+
 function rollup_plugin_search_path() {
 	const js_search = searcher('JS_PATH', 'js');
 	return {
 		name: 'search_path',
 
 		resolveId: function (tee, ter) {
-			if (tee === 'svelte/internal')
-				return path.join(__dirname, 'node_modules', 'svelte', 'internal', 'index.mjs');
+			const parts = tee.split('/');
+			if (parts.length > 0 && parts[0] === 'svelte')
+				return node_resolve(parts);
+
 			return js_search.find(tee);
 		}
-
 	}
 }
 
