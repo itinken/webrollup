@@ -1,6 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 
+// Search for a js file on a path.
 function searcher(envname, ext) {
 	const filepath = process.env[envname] || '.';
 	const dirs = filepath.split(':');
@@ -13,7 +14,7 @@ function searcher(envname, ext) {
 			if (name.startsWith('./') || name.startsWith('../') || name.startsWith('/'))
 				return undefined;
 
-			for (i = 0; i < dirs.length; i++) {
+			for (let i = 0; i < dirs.length; i++) {
 				const dir = dirs[i];
 				const pathname = path.join(dir, name);
 				if (fs.existsSync(pathname)) {
@@ -26,9 +27,32 @@ function searcher(envname, ext) {
 	}
 }
 
-// Resolve a path within the webrollup directory.
-function node_resolve(parts) {
-	return path.join(__dirname, 'node_modules', ...parts, 'index.mjs')
+// Resolve a path within the webrollup's node_modules directory.  This is mainly to
+// deal with svelte imports.  This could import undesired packages, but the js path is
+// tested first so your own packages should always be found first.
+function node_resolve(importee, importer) {
+	if (importee === "")
+		return undefined;
+
+	// Check if the file just exists
+	if (fs.existsSync(importee) && fs.lstatSync(importee).isFile())
+		return undefined;
+
+	// If relative path then resolve it and call this again
+	if (importee[0] === '.') {
+		const pathname = path.join(path.dirname(importer), importee);
+		return node_resolve(pathname, importer);
+	}
+
+	const base = path.join(__dirname, 'node_modules');
+	for (let x of ['index.mjs', 'index.js']) {
+		// Using resolve, deals with the case where 'importee' is absolute.
+		const pn = path.resolve(base, importee, x);
+		if (fs.existsSync(pn))
+			return pn;
+	}
+
+	return undefined;
 }
 
 function rollup_plugin_search_path() {
@@ -36,12 +60,12 @@ function rollup_plugin_search_path() {
 	return {
 		name: 'search_path',
 
-		resolveId: function (tee, ter) {
-			const parts = tee.split('/');
-			if (parts.length > 0 && parts[0] === 'svelte')
-				return node_resolve(parts);
+		resolveId: function (importee, importer) {
+			let res = js_search.find(importee);
+			if (res)
+				return res;
 
-			return js_search.find(tee);
+			return node_resolve(importee, importer);
 		}
 	}
 }
