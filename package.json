@@ -15,7 +15,7 @@
     "cssnano": "^4.1.10",
     "file-exists": "^5.0.1",
     "perfectionist": "^2.4.0",
-    "postcss": "^7.0.18",
+    "postcss": "^8.2.10",
     "postcss-calc": "^7.0.1",
     "postcss-conditionals": "^2.1.0",
     "postcss-css-variables": "^0.13.0",
